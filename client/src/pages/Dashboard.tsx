@@ -117,20 +117,38 @@ export default function Dashboard() {
         <div className="bg-white dark:bg-gray-800 shadow sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6">
             <h3 className="text-base font-semibold leading-6 text-gray-900 dark:text-white">Rozkład kosztów</h3>
-            <div className="mt-5 h-48 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
-              {cashflow.length === 0 ? (
+            {cashflow.length === 0 ? (
+              <div className="mt-5 h-48 flex items-center justify-center border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg">
                 <span className="text-gray-400 dark:text-gray-500">Brak danych</span>
-              ) : (
-                <div className="w-full text-sm text-gray-700 dark:text-gray-200 space-y-1">
-                  {cashflow.map((point) => (
-                    <div key={point.month} className="flex justify-between">
-                      <span>{point.month}</span>
-                      <span>{point.amount.toLocaleString('pl-PL')} PLN</span>
-                    </div>
-                  ))}
+              </div>
+            ) : (
+              <div className="mt-4 space-y-2">
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                  <span>Najbliższe 6 mies.</span>
+                  <span>Łącznie {cashflow.reduce((a, b) => a + b.amount, 0).toLocaleString('pl-PL')} PLN</span>
                 </div>
-              )}
-            </div>
+                <div className="space-y-2">
+                  {cashflow.map((point) => {
+                    const max = Math.max(...cashflow.map((c) => c.amount), 1);
+                    const width = `${Math.round((point.amount / max) * 100)}%`;
+                    return (
+                      <div key={point.month} className="space-y-1">
+                        <div className="flex items-center justify-between text-sm text-gray-800 dark:text-gray-200">
+                          <span className="font-medium">{point.month}</span>
+                          <span className="tabular-nums">{point.amount.toLocaleString('pl-PL')} PLN</span>
+                        </div>
+                        <div className="h-3 w-full rounded-md bg-gray-100 dark:bg-gray-700 overflow-hidden">
+                          <div
+                            className="h-full rounded-md bg-gradient-to-r from-indigo-500 via-blue-500 to-teal-400 dark:from-indigo-400 dark:via-blue-400 dark:to-teal-300"
+                            style={{ width }}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
