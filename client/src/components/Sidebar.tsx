@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { LayoutDashboard, Car, Menu, X, LogOut, Sun, Moon, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Car, Menu, X, LogOut, Sun, Moon, ShieldCheck, Shield } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -41,8 +41,11 @@ export default function Sidebar() {
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
-        <div className="flex h-16 shrink-0 items-center px-6 bg-gray-800 font-bold text-xl tracking-wider">
-          InsureGuard
+        <div className="flex h-16 shrink-0 items-center px-6 bg-gray-800 font-bold text-xl tracking-wider space-x-3">
+          <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-600 text-white shadow-lg">
+            <Shield className="h-5 w-5" aria-hidden="true" />
+          </span>
+          <span>Insurak</span>
         </div>
         <nav className="flex-1 flex flex-col px-4 py-6 gap-y-4">
           <ul role="list" className="flex flex-col gap-y-1">
