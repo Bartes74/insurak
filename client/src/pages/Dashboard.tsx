@@ -97,11 +97,6 @@ export default function Dashboard() {
                         to={`/assets?assetId=${item.assetId}`}
                         className="flex items-start space-x-3 rounded-md border border-gray-200 dark:border-gray-700 px-3 py-2 hover:border-indigo-300 dark:hover:border-indigo-500 hover:bg-indigo-50/40 dark:hover:bg-indigo-900/20"
                       >
-                        <div className="mt-0.5">
-                          <span className="inline-flex items-center rounded-md bg-amber-100 dark:bg-amber-900/50 px-2 py-0.5 text-[11px] font-semibold text-amber-800 dark:text-amber-200">
-                            Uwaga
-                          </span>
-                        </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-semibold text-gray-900 dark:text-white">
                             {item.assetName}
