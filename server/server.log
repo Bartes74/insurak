@@ -1,0 +1,30 @@
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
+Server running on port 3000
+Login error: PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation:
+
+
+The column `main.User.password_hash` does not exist in the current database.
+    at $n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async login (/Users/bartek/Developer/insurak/server/dist/src/controllers/auth.controller.js:17:22) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'User', column: 'main.User.password_hash' }
+}
+Login error: PrismaClientKnownRequestError: 
+Invalid `prisma.user.findUnique()` invocation:
+
+
+The column `main.User.password_hash` does not exist in the current database.
+    at $n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:7315)
+    at $n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6623)
+    at $n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6307)
+    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:130:9633)
+    at async login (/Users/bartek/Developer/insurak/server/dist/src/controllers/auth.controller.js:17:22) {
+  code: 'P2022',
+  clientVersion: '5.22.0',
+  meta: { modelName: 'User', column: 'main.User.password_hash' }
+}

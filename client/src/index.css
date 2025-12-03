@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@variant dark (&:where(.dark, .dark *));
+
+/* Global form control styling for consistent padding/contrast */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="search"],
+input[type="tel"],
+input[type="url"],
+select,
+textarea {
+  @apply w-full rounded-md border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white shadow-inner px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed;
+}
+
+/* Keep checkboxes/radios simple */
+input[type="checkbox"],
+input[type="radio"] {
+  @apply border-slate-300 text-indigo-600 focus:ring-indigo-500;
+}

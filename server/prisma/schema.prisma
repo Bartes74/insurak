@@ -1,0 +1,115 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// --- Użytkownicy ---
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  role         String   @default("USER") // ADMIN, USER
+  canEdit      Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  passwordResetTokens PasswordResetToken[]
+}
+
+// --- Zasoby ---
+model Asset {
+  id                Int       @id @default(autoincrement())
+  name              String
+  type              String    @default("OTHER") // VEHICLE, MACHINE, OTHER
+  identifier        String    @unique // Nr rej, nr seryjny
+  responsiblePerson String?
+  notes             String?   // Wewnętrzne notatki
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  policies          Policy[]
+  notificationRecipients NotificationRecipient[]
+}
+
+// --- Polisy ---
+model Policy {
+  id                      Int       @id @default(autoincrement())
+  policyNumber            String
+  insurer                 String
+  startDate               DateTime
+  endDate                 DateTime
+  premiumAmount           Decimal
+  sumInsured              Decimal?
+  paymentFrequency        String    @default("YEARLY") // YEARLY, MONTHLY, QUARTERLY
+  status                  String    @default("ACTIVE") // ACTIVE, EXPIRED, RENEWAL_IN_PROGRESS, ARCHIVED
+  
+  // Opcjonalne pola z formularza
+  leasingRef              String?
+  insured                 String?   // Ubezpieczony (podmiot)
+  comments                String?   // Uwagi
+
+  notificationOverrideDays Int?     // Nadpisanie globalnych ustawień powiadomień
+  files                   String?   // JSON string z listą plików (ścieżki)
+
+  assetId                 Int
+  asset                   Asset     @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  notificationLogs        NotificationLog[]
+
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+}
+
+// --- Reset haseł ---
+model PasswordResetToken {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt  DateTime
+  used       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+// --- Ustawienia Systemowe ---
+model SystemSetting {
+  key   String @id
+  value String // Przechowuje wartości jako string (np. "30" dla dni)
+}
+
+// --- Globalni odbiorcy powiadomień ---
+model NotificationRecipient {
+  id        Int      @id @default(autoincrement())
+  email     String
+  assetId   Int?     // null = global list
+  asset     Asset?   @relation(fields: [assetId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@index([assetId])
+}
+
+// --- Ustawienia powiadomień ---
+model NotificationSetting {
+  id                     Int      @id @default(autoincrement())
+  defaultLeadDays        Int      @default(30)
+  followUpLeadDays       Int      @default(10)
+  deadlineLeadDays       Int      @default(0)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model NotificationLog {
+  id        Int      @id @default(autoincrement())
+  policyId  Int
+  policy    Policy   @relation(fields: [policyId], references: [id], onDelete: Cascade)
+  stage     String   // first, followup, deadline
+  sentAt    DateTime @default(now())
+
+  @@unique([policyId, stage])
+}
