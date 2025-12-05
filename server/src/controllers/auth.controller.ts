@@ -93,6 +93,7 @@ export const login = async (req: Request, res: Response) => {
         email: user.email,
         role: user.role,
         canEdit: user.canEdit,
+        mustChangePassword: user.mustChangePassword,
       },
     });
   } catch (error) {
@@ -156,4 +157,26 @@ export const resetPassword = async (req: Request, res: Response) => {
   ]);
 
   res.status(200).json({ message: 'Password updated successfully' });
+};
+
+export const changePassword = async (req: Request, res: Response) => {
+  const { newPassword } = req.body;
+  const userId = (req as any).user?.userId;
+
+  if (!newPassword) {
+    res.status(400).json({ message: 'New password is required' });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: {
+      passwordHash,
+      mustChangePassword: false,
+    },
+  });
+
+  res.json({ message: 'Password changed successfully' });
 };

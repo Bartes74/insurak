@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Shield } from 'lucide-react';
+import { Button } from '../components/Button';
+import { Card } from '../components/Card';
+import { Input } from '../components/Input';
 
 export default function Login() {
   const { login } = useAuth();
@@ -15,8 +19,12 @@ export default function Login() {
     setError(null);
     setLoading(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const user = await login(email, password);
+      if (user.mustChangePassword) {
+        navigate('/change-password');
+      } else {
+        navigate('/');
+      }
     } catch (err: any) {
       setError(err?.response?.data?.message || 'Nie udało się zalogować');
     } finally {
@@ -25,43 +33,54 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow">
-        <h1 className="text-2xl font-semibold text-gray-900">Logowanie</h1>
-        <p className="text-sm text-gray-500 mb-6">Zaloguj się, aby kontynuować.</p>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              type="email"
-              className="mt-1"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
+    <div className="min-h-screen flex items-center justify-center bg-neu-base p-4">
+      <Card className="w-full max-w-md">
+        <div className="flex flex-col items-center mb-8">
+          <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl gradient-orange text-white shadow-lg mb-6 transform transition-transform hover:scale-105">
+            <Shield className="h-8 w-8" aria-hidden="true" />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Hasło</label>
-            <input
-              type="password"
-              className="mt-1"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              autoComplete="current-password"
-            />
-          </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Insurak</h1>
+          <p className="text-sm text-gray-500 mt-2">Zaloguj się, aby kontynuować</p>
+        </div>
+
+        <form className="space-y-6" onSubmit={handleSubmit}>
+          <Input
+            label="Email"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            autoComplete="email"
+            placeholder="admin@insurak.local"
+          />
+
+          <Input
+            label="Hasło"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            autoComplete="current-password"
+            placeholder="••••••••"
+          />
+
+          {error && (
+            <div className="rounded-xl bg-red-50 p-4 text-sm text-red-600 border border-red-100 shadow-sm">
+              {error}
+            </div>
+          )}
+
+          <Button
             type="submit"
-            disabled={loading}
-            className="w-full inline-flex justify-center rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 disabled:opacity-50"
+            isLoading={loading}
+            className="w-full"
+            size="lg"
           >
             {loading ? 'Logowanie...' : 'Zaloguj się'}
-          </button>
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
+

@@ -7,13 +7,14 @@ interface User {
   email: string;
   role: 'ADMIN' | 'USER';
   canEdit?: boolean;
+  mustChangePassword?: boolean;
 }
 
 interface AuthContextValue {
   user: User | null;
   token: string | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   logout: () => void;
 }
 
@@ -46,6 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.setItem('auth', JSON.stringify(authData));
     axios.defaults.headers.common.Authorization = `Bearer ${authData.token}`;
     setAuthToken(authData.token);
+    return authData.user;
   };
 
   const logout = () => {

@@ -1,30 +1,57 @@
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
-Server running on port 3000
-Login error: PrismaClientKnownRequestError: 
-Invalid `prisma.user.findUnique()` invocation:
 
+> server@1.0.0 start
+> node dist/index.js
 
-The column `main.User.password_hash` does not exist in the current database.
-    at $n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:7315)
-    at $n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6623)
-    at $n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6307)
-    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:130:9633)
-    at async login (/Users/bartek/Developer/insurak/server/dist/src/controllers/auth.controller.js:17:22) {
-  code: 'P2022',
-  clientVersion: '5.22.0',
-  meta: { modelName: 'User', column: 'main.User.password_hash' }
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+📥 Incoming Request: GET /
+❌ 404 Not Found: GET /
+[0mGET / [33m404[0m 4.443 ms - 32[0m
+📥 Incoming Request: GET /api/dashboard
+📥 Incoming Request: GET /api/assets
+[0mGET /api/dashboard [32m200[0m 18.842 ms - 11853[NotificationNotification job failed PrismaClientKnownRequestError: 
+Invalid `prisma_1.default.notificationLog.create()` invocation in
+/Users/bartek/Developer/insurak/server/dist/lib/notificationScheduler.js:42:44
+
+  39     return !existing;
+  40 }
+  41 async function markSent(policyId, stage) {
+→ 42     await prisma_1.default.notificationLog.create(
+Unique constraint failed on the fields: (`policyId`,`stage`)
+    at _n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async markSent (/Users/bartek/Developer/insurak/server/dist/lib/notificationScheduler.js:42:5)
+    at async processNotificationsOnce (/Users/bartek/Developer/insurak/server/dist/lib/notificationScheduler.js:75:17) {
+  code: 'P2002',
+  clientVersion: '5.10.2',
+  meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-Login error: PrismaClientKnownRequestError: 
-Invalid `prisma.user.findUnique()` invocation:
-
-
-The column `main.User.password_hash` does not exist in the current database.
-    at $n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:7315)
-    at $n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6623)
-    at $n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:121:6307)
-    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:130:9633)
-    at async login (/Users/bartek/Developer/insurak/server/dist/src/controllers/auth.controller.js:17:22) {
-  code: 'P2022',
-  clientVersion: '5.22.0',
-  meta: { modelName: 'User', column: 'main.User.password_hash' }
 }
+ver/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async markSent (/Users/bartek/Developer/insurak/server/dist/lib/notificationScheduler.js:42:5)
+    at async processNotificationsOnce (/Users/bartek/Developer/insurak/server/dist/lib/notificationScheduler.js:75:17) {
+  code: 'P2002',
+  clientVersion: '5.10.2',
+  meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
+}
+📥 Incoming Request: GET /
+❌ 404 Not Found: GET /
+[0mGET / [33m404[0m 16.595 ms - 32[0m
+📥 Incoming Request: GET /
+❌ 404 Not Found: GET /
+[0mGET / [33m404[0m 2.583 ms - 32[0m
+📥 Incoming Request: GET /
+❌ 404 Not Found: GET /
+[0mGET / [33m404[0m 0.348 ms - 32[0m
+📥 Incoming Request: GET /favicon.ico
+❌ 404 Not Found: GET /favicon.ico
+[0mGET /favicon.ico [33m404[0m 0.464 ms - 43[0m
+📥 Incoming Request: GET /?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired
+❌ 404 Not Found: GET /?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired
+[0mGET /?error=access_denied&error_code=otp_expired&error_description=Email+link+is+invalid+or+has+expired [33m404[0m 2.011 ms - 130[0m

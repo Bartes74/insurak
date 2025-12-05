@@ -57,4 +57,10 @@ app.use((req, res) => {
   res.status(404).json({ error: 'Not Found', path: req.originalUrl });
 });
 
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Global Error:', err);
+  res.status(500).json({ message: 'Internal server error' });
+});
+
 export default app;

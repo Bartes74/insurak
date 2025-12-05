@@ -10,6 +10,8 @@ export const listUsers = async (_req: Request, res: Response) => {
   res.json(users);
 };
 
+import { sendWelcomeEmail } from '../lib/mailer';
+
 export const createUser = async (req: Request, res: Response) => {
   const { email, password, role = 'USER', canEdit = false } = req.body;
   if (!email || !password) {
@@ -23,9 +25,17 @@ export const createUser = async (req: Request, res: Response) => {
   }
   const passwordHash = await bcrypt.hash(password, 10);
   const user = await prisma.user.create({
-    data: { email, passwordHash, role, canEdit },
+    data: { email, passwordHash, role, canEdit, mustChangePassword: true },
     select: { id: true, email: true, role: true, canEdit: true, createdAt: true },
   });
+
+  // Send Welcome Email
+  try {
+    await sendWelcomeEmail({ to: email, password });
+  } catch (e) {
+    console.error('Failed to send welcome email:', e);
+  }
+
   res.status(201).json(user);
 };
 

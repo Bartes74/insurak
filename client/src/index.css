@@ -1,5 +1,70 @@
 @import "tailwindcss";
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+@theme {
+  --font-sans: 'Poppins', sans-serif;
+
+  --color-neu-base: #e8ecf4;
+  --color-foreground: #2c3e50;
+  --color-accent-orange: #ff6b35;
+  --color-accent-blue: #4facfe;
+  --color-accent-purple: #9b7ff5;
+  --color-success-green: #51cf66;
+
+  --shadow-neu-flat: 6px 6px 12px #c5c9d2, -6px -6px 12px #ffffff;
+  --shadow-neu-pressed: inset 6px 6px 12px #c5c9d2, inset -6px -6px 12px #ffffff;
+  --shadow-neu-pressed-sm: inset 3px 3px 6px #c5c9d2, inset -3px -3px 6px #ffffff;
+  --shadow-neu-convex: 5px 5px 10px #c5c9d2, -5px -5px 10px #ffffff;
+  --shadow-neu-concave: inset 5px 5px 10px #c5c9d2, inset -5px -5px 10px #ffffff;
+}
+
+@layer base {
+  body {
+    @apply bg-neu-base text-foreground font-sans antialiased;
+  }
+}
+
+@layer utilities {
+  .gradient-orange {
+    @apply bg-gradient-to-r from-[var(--color-accent-orange)] to-[#ff8f6b];
+  }
+
+  .gradient-blue {
+    @apply bg-gradient-to-r from-[var(--color-accent-blue)] to-[#00f2fe];
+  }
+
+  .gradient-purple {
+    @apply bg-gradient-to-r from-[#434343] to-[var(--color-accent-purple)];
+    /* Adjusted for better contrast or use indigo */
+  }
+
+  /* Better purple gradient based on design doc description "Indigo to Purple" */
+  .gradient-indigo-purple {
+    @apply bg-gradient-to-r from-[#667eea] to-[#764ba2];
+  }
+
+  .neu-flat {
+    @apply shadow-neu-flat bg-neu-base;
+  }
+
+  .neu-pressed {
+    @apply shadow-neu-pressed bg-neu-base;
+  }
+
+  .neu-convex {
+    @apply shadow-neu-convex bg-neu-base;
+  }
+
+  .neu-concave {
+    @apply shadow-neu-concave bg-neu-base;
+  }
+
+  .neu-glass {
+    @apply bg-white/30 backdrop-blur-md border border-white/20;
+  }
+}
+
 @variant dark (&:where(.dark, .dark *));
 
 /* Global form control styling for consistent padding/contrast */
@@ -12,11 +77,21 @@ input[type="tel"],
 input[type="url"],
 select,
 textarea {
-  @apply w-full rounded-md border border-slate-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white shadow-inner px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply w-full rounded-xl border-none bg-neu-base text-sm text-foreground shadow-neu-pressed-sm px-4 py-3 focus:ring-2 focus:ring-accent-orange focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300;
 }
 
 /* Keep checkboxes/radios simple */
 input[type="checkbox"],
 input[type="radio"] {
-  @apply border-slate-300 text-indigo-600 focus:ring-indigo-500;
+  @apply border-slate-300 text-accent-orange focus:ring-accent-orange;
+}
+
+/* Fix for Chrome/Safari autofill background color */
+.autofill-white:-webkit-autofill,
+.autofill-white:-webkit-autofill:hover,
+.autofill-white:-webkit-autofill:focus,
+.autofill-white:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #e8ecf4 inset !important;
+  -webkit-text-fill-color: #2c3e50 !important;
+  transition: background-color 5000s ease-in-out 0s;
 }

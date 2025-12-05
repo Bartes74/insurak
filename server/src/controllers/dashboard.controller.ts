@@ -5,9 +5,23 @@ export const getDashboard = async (_req: Request, res: Response) => {
   const now = new Date();
   const in30 = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-  const [activeCount, expiringCount, policies] = await Promise.all([
-    prisma.policy.count({ where: { status: { in: ['ACTIVE', 'RENEWAL_IN_PROGRESS', 'EXPIRING'] } } }),
-    prisma.policy.count({ where: { endDate: { lte: in30 }, status: { in: ['ACTIVE', 'RENEWAL_IN_PROGRESS', 'EXPIRING'] } } }),
+  const [activeCount, expiringCount, expiredCount, totalCount, policies] = await Promise.all([
+    prisma.policy.count({
+      where: {
+        status: { in: ['ACTIVE', 'RENEWAL_IN_PROGRESS', 'EXPIRING'] },
+        endDate: { gt: now } // Only count as active if endDate is in the future
+      }
+    }),
+    prisma.policy.count({ where: { endDate: { lte: in30, gt: now }, status: { in: ['ACTIVE', 'RENEWAL_IN_PROGRESS', 'EXPIRING'] } } }),
+    prisma.policy.count({
+      where: {
+        OR: [
+          { status: 'EXPIRED' },
+          { endDate: { lte: now } }
+        ]
+      }
+    }),
+    prisma.policy.count(),
     prisma.policy.findMany({
       select: {
         id: true,
@@ -34,7 +48,7 @@ export const getDashboard = async (_req: Request, res: Response) => {
     const amount = Number(p.premiumAmount || 0);
     const divisor =
       p.paymentFrequency === 'MONTHLY' ? 1 :
-      p.paymentFrequency === 'QUARTERLY' ? 3 : 12;
+        p.paymentFrequency === 'QUARTERLY' ? 3 : 12;
     return sum + amount / divisor;
   }, 0);
 
@@ -43,6 +57,7 @@ export const getDashboard = async (_req: Request, res: Response) => {
       const reason = getReason(p);
       return !!reason;
     })
+    .sort((a, b) => a.endDate.getTime() - b.endDate.getTime()) // Sort by expiration date ascending
     .map((p) => ({
       assetId: p.assetId,
       assetName: p.asset.name,
@@ -63,6 +78,8 @@ export const getDashboard = async (_req: Request, res: Response) => {
   res.json({
     activePolicies: activeCount,
     expiringSoon: expiringCount,
+    expiredPolicies: expiredCount,
+    totalPolicies: totalCount,
     monthlyCost: Math.round(monthlyCost),
     actionItems,
     cashflow,
@@ -77,8 +94,16 @@ function getReason(p: any): string | null {
   const missingInsured = !p.insured;
 
   if (p.status === 'EXPIRED') return 'Polisa wygasła';
-  const daysToEnd = Math.ceil((p.endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
-  if (daysToEnd <= 30) return 'Polisa wygasa wkrótce';
+
+  const now = new Date();
+  // Check if actually expired by date (compare timestamps)
+  if (p.endDate.getTime() < now.getTime()) return 'Polisa wygasła';
+
+  const daysToEnd = Math.ceil((p.endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+
+  // Only warn if expiring in the future (0 to 30 days)
+  if (daysToEnd >= 0 && daysToEnd <= 30) return 'Polisa wygasa wkrótce';
+
   if (missingPolicyData) return 'Brak danych polisy';
   if (!hasDoc) return 'Brak dokumentu polisy';
   if (missingResponsible) return 'Brak osoby odpowiedzialnej';
@@ -89,7 +114,8 @@ function getReason(p: any): string | null {
 }
 
 function severityFromReason(reason: string): 'warning' | 'info' | 'danger' {
-  if (reason.includes('wygas')) return 'danger';
+  if (reason.includes('wygasła')) return 'danger'; // Expired is danger
+  if (reason.includes('wygasa')) return 'warning'; // Expiring is warning
   if (reason.includes('Brak')) return 'warning';
   if (reason.includes('Odnowienie')) return 'info';
   return 'warning';
