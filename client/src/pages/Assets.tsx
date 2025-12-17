@@ -38,6 +38,7 @@ export default function Assets() {
   const [selectedAsset, setSelectedAsset] = useState<Asset | null>(null);
   const [activeTab, setActiveTab] = useState<'overview' | 'files' | 'history'>('overview');
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'ALL' | 'ACTIVE' | 'EXPIRING' | 'EXPIRED'>('ALL');
 
   // Editing State
   const [isEditing, setIsEditing] = useState(false);
@@ -68,15 +69,17 @@ export default function Assets() {
   });
   const [nAIdentifier, setNAIdentifier] = useState(false);
   const [nAResponsible, setNAResponsible] = useState(false);
-  const [showExpired, setShowExpired] = useState(false);
 
   const filteredAssets = useMemo(() => {
     const filtered = assets.filter((asset) => {
-      // Filter out expired if toggle is off
-      if (!showExpired && (asset.status === 'EXPIRED' || new Date(asset.validUntil) < new Date())) {
-        return false;
+      // 1. Status Filter
+      if (statusFilter !== 'ALL') {
+        if (statusFilter === 'ACTIVE' && asset.status !== 'ACTIVE') return false;
+        if (statusFilter === 'EXPIRING' && asset.status !== 'EXPIRING') return false;
+        if (statusFilter === 'EXPIRED' && asset.status !== 'EXPIRED') return false;
       }
 
+      // 2. Search Query
       return (
         asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         asset.identifier.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -90,14 +93,24 @@ export default function Assets() {
       if (!b.validUntil) return -1;
       return new Date(a.validUntil).getTime() - new Date(b.validUntil).getTime();
     });
-  }, [assets, searchQuery, showExpired]);
+  }, [assets, searchQuery, statusFilter]);
   const location = useLocation();
   const navigate = useNavigate();
 
-  // auto-open asset from query param assetId
+  // auto-open asset from query param assetId AND set status filter
   React.useEffect(() => {
     const params = new URLSearchParams(location.search);
     const id = params.get('assetId');
+    const status = params.get('status');
+
+    if (status) {
+      if (['ACTIVE', 'EXPIRING', 'EXPIRED'].includes(status.toUpperCase())) {
+        setStatusFilter(status.toUpperCase() as any);
+      } else {
+        setStatusFilter('ALL');
+      }
+    }
+
     if (id && assets.length > 0) {
       const match = assets.find((a) => a.id === Number(id));
       if (match) handleOpenAsset(match);
@@ -464,30 +477,49 @@ export default function Assets() {
       )}
 
       {/* Search Bar & Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
-        <div className="relative max-w-md flex-1">
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-            <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
-          </div>
-          <input
-            type="text"
-            className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800"
-            placeholder="Szukaj ubezpieczeń, nr rej..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+      {/* Search Bar & Filters */}
+      <div className="flex flex-col gap-4">
+        {/* Status Tabs */}
+        <div className="flex space-x-1 rounded-xl bg-gray-100 dark:bg-gray-800 p-1 w-fit">
+          {(['ALL', 'ACTIVE', 'EXPIRING', 'EXPIRED'] as const).map((status) => (
+            <button
+              key={status}
+              onClick={() => {
+                setStatusFilter(status);
+                // Update URL to reflect change (optional, but good for UX)
+                const params = new URLSearchParams(location.search);
+                if (status === 'ALL') params.delete('status');
+                else params.set('status', status);
+                navigate(`${location.pathname}?${params.toString()}`, { replace: true });
+              }}
+              className={clsx(
+                'w-full rounded-lg py-2.5 px-4 text-sm font-medium leading-5 transition-all',
+                statusFilter === status
+                  ? 'bg-white dark:bg-gray-700 text-indigo-700 dark:text-indigo-400 shadow'
+                  : 'text-gray-500 dark:text-gray-400 hover:bg-white/[0.12] hover:text-indigo-600 dark:hover:text-indigo-300'
+              )}
+            >
+              {status === 'ALL' ? 'Wszystkie' :
+                status === 'ACTIVE' ? 'Aktywne' :
+                  status === 'EXPIRING' ? 'Wygasające' : 'Wygasłe'}
+            </button>
+          ))}
         </div>
 
-        <label className="inline-flex items-center cursor-pointer">
-          <input
-            type="checkbox"
-            className="sr-only peer"
-            checked={showExpired}
-            onChange={(e) => setShowExpired(e.target.checked)}
-          />
-          <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
-          <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pokaż wygasłe</span>
-        </label>
+        <div className="flex flex-col sm:flex-row gap-4 sm:items-center">
+          <div className="relative max-w-md flex-1">
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+              <Search className="h-5 w-5 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+            </div>
+            <input
+              type="text"
+              className="block w-full rounded-md border-0 py-1.5 pl-3 pr-10 text-gray-900 dark:text-white ring-1 ring-inset ring-gray-300 dark:ring-gray-700 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 bg-white dark:bg-gray-800"
+              placeholder="Szukaj ubezpieczeń, nr rej..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Asset List (Card Rows) */}

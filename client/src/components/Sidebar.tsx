@@ -37,7 +37,7 @@ export default function Sidebar() {
       {/* Sidebar component */}
       <div
         className={clsx(
-          'fixed inset-y-0 left-0 z-40 transform bg-white/80 backdrop-blur-xl border-r border-white/20 shadow-neu-flat transition-all duration-300 ease-in-out',
+          'fixed inset-y-0 left-0 z-40 transform bg-white/80 backdrop-blur-xl border-r border-white/20 shadow-neu-flat transition-all duration-300 ease-in-out dark:bg-black/80 dark:border-white/10 dark:shadow-[var(--shadow-neu-flat-dark)]',
           // Mobile: collapsed (w-16) or expanded (w-64) based on isOpen
           // Desktop: always expanded (w-64)
           isOpen ? 'w-64 translate-x-0' : 'w-16 translate-x-0 lg:w-64'
@@ -47,7 +47,7 @@ export default function Sidebar() {
           <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl gradient-orange text-white shadow-lg shrink-0">
             <Shield className="h-6 w-6" aria-hidden="true" />
           </span>
-          <span className={clsx("transition-opacity duration-300 text-foreground", isOpen ? "opacity-100" : "opacity-0 lg:opacity-100 hidden lg:block")}>Insurak</span>
+          <span className={clsx("transition-opacity duration-300 text-foreground dark:text-[var(--color-foreground-dark)]", isOpen ? "opacity-100" : "opacity-0 lg:opacity-100 hidden lg:block")}>Insurak</span>
         </div>
         <nav className="flex-1 flex flex-col px-3 py-6 gap-y-4">
           <ul role="list" className="flex flex-col gap-y-2">
@@ -60,7 +60,7 @@ export default function Sidebar() {
                     className={clsx(
                       isActive
                         ? 'gradient-orange text-white shadow-md'
-                        : 'text-gray-500 hover:text-accent-orange hover:bg-white',
+                        : 'text-gray-500 hover:text-accent-orange hover:bg-white dark:text-gray-400 dark:hover:bg-white/10',
                       'group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold transition-all duration-300',
                       !isOpen && 'justify-center lg:justify-start'
                     )}
@@ -82,7 +82,7 @@ export default function Sidebar() {
         <div className="flex flex-col gap-2 shrink-0 p-3 border-t border-gray-100">
           <button
             onClick={toggleTheme}
-            className={clsx("group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold text-gray-500 hover:text-accent-orange hover:bg-white w-full transition-all duration-300", !isOpen && 'justify-center lg:justify-start')}
+            className={clsx("group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold text-gray-500 hover:text-accent-orange hover:bg-white dark:text-gray-400 dark:hover:bg-white/10 w-full transition-all duration-300", !isOpen && 'justify-center lg:justify-start')}
             title={!isOpen ? (theme === 'light' ? 'Tryb Ciemny' : 'Tryb Jasny') : undefined}
           >
             {theme === 'light' ? (
@@ -99,7 +99,7 @@ export default function Sidebar() {
           </button>
           <button
             onClick={() => { logout(); navigate('/login'); }}
-            className={clsx("group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold text-gray-500 hover:text-red-500 hover:bg-red-50 w-full transition-all duration-300", !isOpen && 'justify-center lg:justify-start')}
+            className={clsx("group flex gap-x-3 rounded-xl p-3 text-sm leading-6 font-semibold text-gray-500 hover:text-red-500 hover:bg-red-50 dark:text-gray-400 dark:hover:bg-red-900/20 w-full transition-all duration-300", !isOpen && 'justify-center lg:justify-start')}
             title={!isOpen ? 'Wyloguj' : undefined}
           >
             <LogOut className="h-6 w-6 shrink-0" aria-hidden="true" />

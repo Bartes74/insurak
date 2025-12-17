@@ -875,17 +875,15 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-ng due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
@@ -1062,17 +1060,15 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-...[39m
 [32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🗂️ backup and recover secrets: https://dotenvx.com/ops
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+hanges...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
@@ -1101,14 +1097,45 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-2m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
 ✅ Loading asset routes...
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔄 add secrets lifecycle management: https://dotenvx.com/ops
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  enable debug logging with { debug: true }
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+st:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+Notification job failed PrismaClientKnownRequestError: 
+Invalid `prisma.notificationLog.create()` invocation in
+/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:32
+
+  37 }
+  38 
+  39 async function markSent(policyId: number, stage: string) {
+→ 40   await prisma.notificationLog.create(
+Unique constraint failed on the fields: (`policyId`,`stage`)
+    at _n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6854)
+    at _n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6188)
+    at _n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:5896)
+    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:128:10871)
+    at async markSent (/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:3)
+    at async processNotificationsOnce (/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:78:9) {
+  code: 'P2002',
+  clientVersion: '5.10.2',
+  meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
+}
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  load multiple .env files with { path: ['.env.local', '.env'] }
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+event committing .env to code: https://dotenvx.com/precommit
 🚀 Server running on http://localhost:3000
 👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
 ⏰ Notification scheduler starting with CRON: 0 */6 * * *
@@ -1131,31 +1158,15 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-nges...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
 ✅ Loading asset routes...
-[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 👥 sync secrets across teammates & machines: https://dotenvx.com/ops
 🚀 Server running on http://localhost:3000
 👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
 ⏰ Notification scheduler starting with CRON: 0 */6 * * *
-Notification job failed PrismaClientKnownRequestError: 
-Invalid `prisma.notificationLog.create()` invocation in
-/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:32
-
-  37 }
-  38 
-  39 async function markSent(policyId: number, stage: string) {
-→ 40   await prisma.notificationLog.create(
-Unique constraint failed on the fields: (`policyId`,`stage`)
-    at _n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6854)
-    at _n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6188)
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6188)
     at _n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:5896)
     at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:128:10871)
     at async markSent (/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:3)
@@ -1164,35 +1175,15 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-rror: 
-Invalid `prisma.notificationLog.create()` invocation in
-/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:32
-
-  37 }
-  38 
-  39 async function markSent(policyId: number, stage: string) {
-→ 40   await prisma.notificationLog.create(
-Unique constraint failed on the fields: (`policyId`,`stage`)
-    at _n.handleRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6854)
-    at _n.handleAndLogRequestError (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:6188)
-    at _n.request (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:123:5896)
-    at async l (/Users/bartek/Developer/insurak/server/node_modules/@prisma/client/runtime/library.js:128:10871)
-    at async markSent (/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:3)
-    at async processNotificationsOnce (/Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:78:9) {
-  code: 'P2002',
-  clientVersion: '5.10.2',
-  meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
-}
-o changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] starting `ts-node src/index.ts`[39m
 ✅ Loading asset routes...
-[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  specify custom .env file path with { path: '/custom/path/.env' }
 🚀 Server running on http://localhost:3000
 👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
 ⏰ Notification scheduler starting with CRON: 0 */6 * * *
-Notification job failed PrismaClientKnownRequestError: 
-Invalid `prisma.notificationLog.create()` invocation in
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+tificationLog.create()` invocation in
 /Users/bartek/Developer/insurak/server/src/lib/notificationScheduler.ts:40:32
 
   37 }
@@ -1210,17 +1201,15 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
-.[39m
 [32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
-[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: ⚙️  suppress all logs with { quiet: true }
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+ng due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
 [32m[nodemon] restarting due to changes...[39m
@@ -1730,3 +1719,11 @@ Unique constraint failed on the fields: (`policyId`,`stage`)
   clientVersion: '5.10.2',
   meta: { modelName: 'NotificationLog', target: [ 'policyId', 'stage' ] }
 }
+[32m[nodemon] restarting due to changes...[39m
+[32m[nodemon] starting `ts-node src/index.ts`[39m
+✅ Loading asset routes...
+[dotenv@17.2.3] injecting env (0) from .env -- tip: 🔐 encrypt with Dotenvx: https://dotenvx.com
+🚀 Server running on http://localhost:3000
+👉 Routes registered: /api/assets (GET, POST, PUT, DELETE)
+⏰ Notification scheduler starting with CRON: 0 */6 * * *
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m

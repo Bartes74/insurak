@@ -5,23 +5,42 @@
 @theme {
   --font-sans: 'Poppins', sans-serif;
 
+  /* Light Mode Colors */
   --color-neu-base: #e8ecf4;
   --color-foreground: #2c3e50;
+
+  /* Dark Mode Colors - High Contrast */
+  --color-neu-base-dark: #1a1b1e;
+  --color-foreground-dark: #f8f9fa;
+  /* Almost white for text */
+  --color-foreground-muted-dark: #d1d5db;
+  /* Lighter gray for secondary text */
+
   --color-accent-orange: #ff6b35;
   --color-accent-blue: #4facfe;
   --color-accent-purple: #9b7ff5;
   --color-success-green: #51cf66;
 
+  /* Light Mode Shadows */
   --shadow-neu-flat: 6px 6px 12px #c5c9d2, -6px -6px 12px #ffffff;
   --shadow-neu-pressed: inset 6px 6px 12px #c5c9d2, inset -6px -6px 12px #ffffff;
   --shadow-neu-pressed-sm: inset 3px 3px 6px #c5c9d2, inset -3px -3px 6px #ffffff;
   --shadow-neu-convex: 5px 5px 10px #c5c9d2, -5px -5px 10px #ffffff;
   --shadow-neu-concave: inset 5px 5px 10px #c5c9d2, inset -5px -5px 10px #ffffff;
+
+  /* Dark Mode Shadows - Subtle lighting effects */
+  --shadow-neu-flat-dark: 5px 5px 10px #121315, -5px -5px 10px #222327;
+  --shadow-neu-pressed-dark: inset 5px 5px 10px #121315, inset -5px -5px 10px #222327;
+  --shadow-neu-pressed-sm-dark: inset 2px 2px 5px #121315, inset -2px -2px 5px #222327;
 }
 
 @layer base {
   body {
-    @apply bg-neu-base text-foreground font-sans antialiased;
+    @apply bg-neu-base text-foreground font-sans antialiased transition-colors duration-300;
+  }
+
+  .dark body {
+    @apply bg-[var(--color-neu-base-dark)] text-[var(--color-foreground-dark)];
   }
 }
 
@@ -45,23 +64,23 @@
   }
 
   .neu-flat {
-    @apply shadow-neu-flat bg-neu-base;
+    @apply shadow-neu-flat bg-neu-base dark:shadow-[var(--shadow-neu-flat-dark)] dark:bg-[var(--color-neu-base-dark)];
   }
 
   .neu-pressed {
-    @apply shadow-neu-pressed bg-neu-base;
+    @apply shadow-neu-pressed bg-neu-base dark:shadow-[var(--shadow-neu-pressed-dark)] dark:bg-[var(--color-neu-base-dark)];
   }
 
   .neu-convex {
-    @apply shadow-neu-convex bg-neu-base;
+    @apply shadow-neu-convex bg-neu-base dark:shadow-[var(--shadow-neu-flat-dark)] dark:bg-[var(--color-neu-base-dark)];
   }
 
   .neu-concave {
-    @apply shadow-neu-concave bg-neu-base;
+    @apply shadow-neu-concave bg-neu-base dark:shadow-[var(--shadow-neu-pressed-dark)] dark:bg-[var(--color-neu-base-dark)];
   }
 
   .neu-glass {
-    @apply bg-white/30 backdrop-blur-md border border-white/20;
+    @apply bg-white/30 backdrop-blur-md border border-white/20 dark:bg-black/30 dark:border-white/10;
   }
 }
 
@@ -77,7 +96,7 @@ input[type="tel"],
 input[type="url"],
 select,
 textarea {
-  @apply w-full rounded-xl border-none bg-neu-base text-sm text-foreground shadow-neu-pressed-sm px-4 py-3 focus:ring-2 focus:ring-accent-orange focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300;
+  @apply w-full rounded-xl border-none bg-neu-base text-sm text-foreground shadow-neu-pressed-sm px-4 py-3 focus:ring-2 focus:ring-accent-orange focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 dark:bg-[var(--color-neu-base-dark)] dark:text-[var(--color-foreground-dark)] dark:shadow-[var(--shadow-neu-pressed-sm-dark)];
 }
 
 /* Keep checkboxes/radios simple */
@@ -94,4 +113,12 @@ input[type="radio"] {
   -webkit-box-shadow: 0 0 0 30px #e8ecf4 inset !important;
   -webkit-text-fill-color: #2c3e50 !important;
   transition: background-color 5000s ease-in-out 0s;
+}
+
+.dark .autofill-white:-webkit-autofill,
+.dark .autofill-white:-webkit-autofill:hover,
+.dark .autofill-white:-webkit-autofill:focus,
+.dark .autofill-white:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #1a1b1e inset !important;
+  -webkit-text-fill-color: #f8f9fa !important;
 }

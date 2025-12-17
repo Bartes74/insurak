@@ -17,21 +17,21 @@ export default function SlideOver({ open, onClose, title, children }: SlideOverP
         open ? "pointer-events-auto visible" : "pointer-events-none invisible"
       )}
     >
-        {/* Backdrop */}
-      <div 
+      {/* Backdrop */}
+      <div
         className={clsx(
-            "absolute inset-0 bg-gray-500/75 dark:bg-gray-900/80 transition-opacity duration-300",
-            open ? "opacity-100" : "opacity-0"
-        )} 
+          "absolute inset-0 bg-gray-500/50 dark:bg-gray-900/50 backdrop-blur-sm transition-opacity duration-300",
+          open ? "opacity-100" : "opacity-0"
+        )}
         onClick={onClose}
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
         <div
-            className={clsx(
-                "pointer-events-auto w-screen max-w-[750px] transform transition duration-300 sm:duration-300",
-                open ? "translate-x-0" : "translate-x-full"
-            )}
+          className={clsx(
+            "pointer-events-auto w-screen max-w-[750px] transform transition duration-300 sm:duration-300",
+            open ? "translate-x-0" : "translate-x-full"
+          )}
         >
           <div className="flex h-full flex-col overflow-y-scroll bg-white dark:bg-gray-800 shadow-xl">
             <div className="px-4 py-6 sm:px-6 border-b border-gray-200 dark:border-gray-700">
