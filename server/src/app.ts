@@ -11,19 +11,20 @@ import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { authenticateToken } from './middleware/auth.middleware';
 import { getDashboard } from './controllers/dashboard.controller';
+import { config } from './config';
 
 const app = express();
 
 // Basic rate limiting for auth + uploads
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.AUTH_RATE_MAX) || 50,
+  max: config.authRateMax,
   standardHeaders: true,
   legacyHeaders: false,
 });
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: Number(process.env.UPLOAD_RATE_MAX) || 100,
+  max: config.uploadRateMax,
   standardHeaders: true,
   legacyHeaders: false,
 });

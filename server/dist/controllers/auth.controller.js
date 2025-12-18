@@ -9,16 +9,18 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
 const prisma_1 = __importDefault(require("../lib/prisma"));
 const mailer_1 = require("../lib/mailer");
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-change-me';
+const config_1 = require("../config");
+const auth_schema_1 = require("../schemas/auth.schema");
 const RESET_EXPIRY_MINUTES = 60;
-const signToken = (payload) => jsonwebtoken_1.default.sign(payload, JWT_SECRET, { expiresIn: '24h' });
+const signToken = (payload) => jsonwebtoken_1.default.sign(payload, config_1.config.jwtSecret, { expiresIn: '24h' });
 const register = async (req, res) => {
     try {
-        const { email, password, role = 'USER', canEdit = false } = req.body;
-        if (!email || !password) {
-            res.status(400).json({ message: 'Email and password are required' });
+        const validation = auth_schema_1.registerSchema.safeParse(req.body);
+        if (!validation.success) {
+            res.status(400).json({ message: 'Validation error', errors: validation.error.format() });
             return;
         }
+        const { email, password, role = 'USER', canEdit = false } = validation.data;
         const userCount = await prisma_1.default.user.count();
         // Bootstrapping: allow first user without auth; afterwards only ADMIN can add users.
         if (userCount > 0) {
@@ -38,7 +40,7 @@ const register = async (req, res) => {
             data: {
                 email,
                 passwordHash,
-                role,
+                role: role, // Zod schema allows string, Prisma expects string
                 canEdit,
             },
         });
@@ -59,11 +61,12 @@ const register = async (req, res) => {
 exports.register = register;
 const login = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            res.status(400).json({ message: 'Email and password are required' });
+        const validation = auth_schema_1.loginSchema.safeParse(req.body);
+        if (!validation.success) {
+            res.status(400).json({ message: 'Validation error', errors: validation.error.format() });
             return;
         }
+        const { email, password } = validation.data;
         const user = await prisma_1.default.user.findUnique({ where: { email } });
         if (!user) {
             res.status(401).json({ message: 'Invalid credentials' });
@@ -93,11 +96,12 @@ const login = async (req, res) => {
 };
 exports.login = login;
 const forgotPassword = async (req, res) => {
-    const { email } = req.body;
-    if (!email) {
-        res.status(400).json({ message: 'Email is required' });
+    const validation = auth_schema_1.forgotPasswordSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ message: 'Validation error', errors: validation.error.format() });
         return;
     }
+    const { email } = validation.data;
     const user = await prisma_1.default.user.findUnique({ where: { email } });
     if (!user) {
         // Do not leak existence
@@ -122,11 +126,12 @@ const forgotPassword = async (req, res) => {
 };
 exports.forgotPassword = forgotPassword;
 const resetPassword = async (req, res) => {
-    const { token, password } = req.body;
-    if (!token || !password) {
-        res.status(400).json({ message: 'Token and new password are required' });
+    const validation = auth_schema_1.resetPasswordSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ message: 'Validation error', errors: validation.error.format() });
         return;
     }
+    const { token, password } = validation.data;
     const record = await prisma_1.default.passwordResetToken.findUnique({ where: { token } });
     if (!record || record.used || record.expiresAt < new Date()) {
         res.status(400).json({ message: 'Invalid or expired token' });
@@ -141,12 +146,19 @@ const resetPassword = async (req, res) => {
 };
 exports.resetPassword = resetPassword;
 const changePassword = async (req, res) => {
-    const { newPassword } = req.body;
-    const userId = req.user?.userId;
-    if (!newPassword) {
-        res.status(400).json({ message: 'New password is required' });
+    const validation = auth_schema_1.changePasswordSchema.safeParse(req.body);
+    if (!validation.success) {
+        res.status(400).json({ message: 'Validation error', errors: validation.error.format() });
         return;
     }
+    const { newPassword } = validation.data;
+    // Use non-null assertion or check because auth middleware ensures user exists
+    // But for type safety, let's check
+    if (!req.user || !req.user.userId) {
+        res.sendStatus(401);
+        return;
+    }
+    const userId = req.user.userId;
     const passwordHash = await bcryptjs_1.default.hash(newPassword, 10);
     await prisma_1.default.user.update({
         where: { id: userId },
