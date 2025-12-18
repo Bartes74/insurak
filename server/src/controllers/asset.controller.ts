@@ -6,7 +6,13 @@ import { createAssetSchema, updateAssetSchema, renewPolicySchema } from '../sche
 
 const prisma = new PrismaClient();
 
+// ============================================================================
 // Helpers
+// ============================================================================
+
+/**
+ * Calculates current policy status based on endDate.
+ */
 const computeStatus = (policy: Policy) => {
     const today = new Date();
     if (policy.status === 'ARCHIVED' || policy.status === 'RENEWAL_IN_PROGRESS') return policy.status;
@@ -18,6 +24,9 @@ const computeStatus = (policy: Policy) => {
     return 'ACTIVE';
 };
 
+/**
+ * Calculates progress percentage of the policy duration.
+ */
 const computeProgress = (policy: Policy) => {
     const total = policy.endDate.getTime() - policy.startDate.getTime();
     const passed = Date.now() - policy.startDate.getTime();
@@ -26,6 +35,15 @@ const computeProgress = (policy: Policy) => {
     return Math.round(pct);
 };
 
+// ============================================================================
+// Controllers
+// ============================================================================
+
+/**
+ * GET /api/assets
+ * Fetches all assets and their LATEST policy details.
+ * transforms data for the frontend dashboard table.
+ */
 export const getAssets = async (req: Request, res: Response) => {
     try {
         const assets = await prisma.asset.findMany({
@@ -73,6 +91,11 @@ export const getAssets = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * POST /api/assets
+ * Creates a new asset and optionally its first policy.
+ * Uses a transaction to ensure atomicity.
+ */
 export const createAsset = async (req: Request, res: Response) => {
     try {
         const validation = createAssetSchema.safeParse(req.body);
@@ -125,6 +148,10 @@ export const createAsset = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * PUT /api/assets/:id
+ * Updates asset details and the LATEST policy (if applicable).
+ */
 export const updateAsset = async (req: Request, res: Response) => {
     const { id } = req.params;
     const validation = updateAssetSchema.safeParse(req.body);
@@ -190,6 +217,10 @@ export const updateAsset = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * DELETE /api/assets/:id
+ * Removes an asset. Cascading delete is handled by Prisma schema.
+ */
 export const deleteAsset = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
@@ -202,6 +233,10 @@ export const deleteAsset = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * POST /api/assets/:id/files
+ * Uploads files to the LATEST policy of an asset.
+ */
 export const uploadPolicyFiles = async (req: Request, res: Response) => {
     const { id } = req.params;
     const files = (req as any).files as Express.Multer.File[];
@@ -247,6 +282,10 @@ export const uploadPolicyFiles = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * GET /api/assets/:id/files
+ * Lists files attached to the latest policy.
+ */
 export const listPolicyFiles = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {
@@ -266,6 +305,10 @@ export const listPolicyFiles = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * GET /api/assets/:id/files/:filename
+ * Downloads a specific file.
+ */
 export const downloadPolicyFile = async (req: Request, res: Response) => {
     const { id, filename } = req.params;
     try {
@@ -297,6 +340,10 @@ export const downloadPolicyFile = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * POST /api/assets/:id/renew
+ * Archives the old policy and creates a new one (Renewal).
+ */
 export const renewPolicy = async (req: Request, res: Response) => {
     const { id } = req.params;
 
@@ -350,6 +397,10 @@ export const renewPolicy = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * GET /api/assets/:id/history
+ * Fetches all policies for a given asset (History).
+ */
 export const getPolicyHistory = async (req: Request, res: Response) => {
     const { id } = req.params;
     try {

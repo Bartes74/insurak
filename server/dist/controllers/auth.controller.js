@@ -12,7 +12,21 @@ const mailer_1 = require("../lib/mailer");
 const config_1 = require("../config");
 const auth_schema_1 = require("../schemas/auth.schema");
 const RESET_EXPIRY_MINUTES = 60;
+/**
+ * Signs a JWT token with user details.
+ * @param payload Object containing minimal user info (id, email, role)
+ */
 const signToken = (payload) => jsonwebtoken_1.default.sign(payload, config_1.config.jwtSecret, { expiresIn: '24h' });
+/**
+ * Registers a new user.
+ *
+ * Logic:
+ * 1. Validates input using Zod.
+ * 2. Checks if this is the FIRST user (bootstrapping). If so, allows registration without admin rights.
+ * 3. If users exist, enforces ADMIN role for creating new users.
+ * 4. Checks for email uniqueness.
+ * 5. Hashes password and creates user.
+ */
 const register = async (req, res) => {
     try {
         const validation = auth_schema_1.registerSchema.safeParse(req.body);
@@ -40,7 +54,7 @@ const register = async (req, res) => {
             data: {
                 email,
                 passwordHash,
-                role: role, // Zod schema allows string, Prisma expects string
+                role: role,
                 canEdit,
             },
         });
@@ -59,6 +73,9 @@ const register = async (req, res) => {
     }
 };
 exports.register = register;
+/**
+ * Authenticates a user and returns a JWT.
+ */
 const login = async (req, res) => {
     try {
         const validation = auth_schema_1.loginSchema.safeParse(req.body);
@@ -95,6 +112,11 @@ const login = async (req, res) => {
     }
 };
 exports.login = login;
+/**
+ * Initiates the password reset flow.
+ * usage: Sends an email with a reset token if the user exists.
+ * Security: Always returns success to prevent email enumeration.
+ */
 const forgotPassword = async (req, res) => {
     const validation = auth_schema_1.forgotPasswordSchema.safeParse(req.body);
     if (!validation.success) {
@@ -104,7 +126,7 @@ const forgotPassword = async (req, res) => {
     const { email } = validation.data;
     const user = await prisma_1.default.user.findUnique({ where: { email } });
     if (!user) {
-        // Do not leak existence
+        // Return success to avoid leaking which emails exist in the DB
         res.status(200).json({ message: 'If the email exists, a reset link will be sent.' });
         return;
     }
@@ -125,6 +147,9 @@ const forgotPassword = async (req, res) => {
     res.status(200).json({ message: 'If the email exists, a reset link will be sent.' });
 };
 exports.forgotPassword = forgotPassword;
+/**
+ * Resets user password using a valid token.
+ */
 const resetPassword = async (req, res) => {
     const validation = auth_schema_1.resetPasswordSchema.safeParse(req.body);
     if (!validation.success) {
@@ -138,6 +163,7 @@ const resetPassword = async (req, res) => {
         return;
     }
     const passwordHash = await bcryptjs_1.default.hash(password, 10);
+    // Transaction: Update password AND mark token as used
     await prisma_1.default.$transaction([
         prisma_1.default.user.update({ where: { id: record.userId }, data: { passwordHash } }),
         prisma_1.default.passwordResetToken.update({ where: { id: record.id }, data: { used: true } }),
@@ -145,6 +171,10 @@ const resetPassword = async (req, res) => {
     res.status(200).json({ message: 'Password updated successfully' });
 };
 exports.resetPassword = resetPassword;
+/**
+ * Allows an authenticated user to change their own password.
+ * Typically used to enforce "Change Password on First Login" or voluntary updates.
+ */
 const changePassword = async (req, res) => {
     const validation = auth_schema_1.changePasswordSchema.safeParse(req.body);
     if (!validation.success) {
@@ -152,8 +182,6 @@ const changePassword = async (req, res) => {
         return;
     }
     const { newPassword } = validation.data;
-    // Use non-null assertion or check because auth middleware ensures user exists
-    // But for type safety, let's check
     if (!req.user || !req.user.userId) {
         res.sendStatus(401);
         return;
@@ -164,7 +192,7 @@ const changePassword = async (req, res) => {
         where: { id: userId },
         data: {
             passwordHash,
-            mustChangePassword: false,
+            mustChangePassword: false, // Clear flag if it was set
         },
     });
     res.json({ message: 'Password changed successfully' });

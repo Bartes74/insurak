@@ -9,8 +9,22 @@ import { loginSchema, registerSchema, forgotPasswordSchema, resetPasswordSchema,
 
 const RESET_EXPIRY_MINUTES = 60;
 
+/**
+ * Signs a JWT token with user details.
+ * @param payload Object containing minimal user info (id, email, role)
+ */
 const signToken = (payload: any) => jwt.sign(payload, config.jwtSecret, { expiresIn: '24h' });
 
+/**
+ * Registers a new user.
+ * 
+ * Logic:
+ * 1. Validates input using Zod.
+ * 2. Checks if this is the FIRST user (bootstrapping). If so, allows registration without admin rights.
+ * 3. If users exist, enforces ADMIN role for creating new users.
+ * 4. Checks for email uniqueness.
+ * 5. Hashes password and creates user.
+ */
 export const register = async (req: Request, res: Response) => {
   try {
     const validation = registerSchema.safeParse(req.body);
@@ -43,7 +57,7 @@ export const register = async (req: Request, res: Response) => {
       data: {
         email,
         passwordHash,
-        role: role as string, // Zod schema allows string, Prisma expects string
+        role: role as string,
         canEdit,
       },
     });
@@ -62,6 +76,9 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Authenticates a user and returns a JWT.
+ */
 export const login = async (req: Request, res: Response) => {
   try {
     const validation = loginSchema.safeParse(req.body);
@@ -103,6 +120,11 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
+/**
+ * Initiates the password reset flow.
+ * usage: Sends an email with a reset token if the user exists.
+ * Security: Always returns success to prevent email enumeration.
+ */
 export const forgotPassword = async (req: Request, res: Response) => {
   const validation = forgotPasswordSchema.safeParse(req.body);
   if (!validation.success) {
@@ -113,7 +135,7 @@ export const forgotPassword = async (req: Request, res: Response) => {
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    // Do not leak existence
+    // Return success to avoid leaking which emails exist in the DB
     res.status(200).json({ message: 'If the email exists, a reset link will be sent.' });
     return;
   }
@@ -138,6 +160,9 @@ export const forgotPassword = async (req: Request, res: Response) => {
   res.status(200).json({ message: 'If the email exists, a reset link will be sent.' });
 };
 
+/**
+ * Resets user password using a valid token.
+ */
 export const resetPassword = async (req: Request, res: Response) => {
   const validation = resetPasswordSchema.safeParse(req.body);
   if (!validation.success) {
@@ -154,6 +179,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   const passwordHash = await bcrypt.hash(password, 10);
 
+  // Transaction: Update password AND mark token as used
   await prisma.$transaction([
     prisma.user.update({ where: { id: record.userId }, data: { passwordHash } }),
     prisma.passwordResetToken.update({ where: { id: record.id }, data: { used: true } }),
@@ -162,6 +188,10 @@ export const resetPassword = async (req: Request, res: Response) => {
   res.status(200).json({ message: 'Password updated successfully' });
 };
 
+/**
+ * Allows an authenticated user to change their own password.
+ * Typically used to enforce "Change Password on First Login" or voluntary updates.
+ */
 export const changePassword = async (req: Request, res: Response) => {
   const validation = changePasswordSchema.safeParse(req.body);
   if (!validation.success) {
@@ -170,8 +200,6 @@ export const changePassword = async (req: Request, res: Response) => {
   }
   const { newPassword } = validation.data;
 
-  // Use non-null assertion or check because auth middleware ensures user exists
-  // But for type safety, let's check
   if (!req.user || !req.user.userId) {
     res.sendStatus(401);
     return;
@@ -185,9 +213,10 @@ export const changePassword = async (req: Request, res: Response) => {
     where: { id: userId },
     data: {
       passwordHash,
-      mustChangePassword: false,
+      mustChangePassword: false, // Clear flag if it was set
     },
   });
 
   res.json({ message: 'Password changed successfully' });
 };
+

@@ -13,6 +13,10 @@ if (saved) {
   api.defaults.headers.common.Authorization = `Bearer ${parsed.token}`;
 }
 
+/**
+ * Configure global Axios headers with the JWT token.
+ * If token is null, removes the Authorization header.
+ */
 export const setAuthToken = (token: string | null) => {
   if (token) {
     api.defaults.headers.common.Authorization = `Bearer ${token}`;
@@ -27,6 +31,7 @@ api.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       // Token expired or invalid
+      // console.warn('Session expired, redirecting to login...');
       localStorage.removeItem('auth');
       setAuthToken(null);
       window.location.href = '/login';

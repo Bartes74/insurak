@@ -1,46 +1,104 @@
-# InsureGuard
+# Insurak - Insurance Asset Management
 
-System Zarządzania Ubezpieczeniami (Insurance Management System).
+Insurak is a web application designed to manage company assets and their insurance policies. It allows tracking of vehicles, machinery, and other assets, monitoring policy statuses (active, expiring, expired), and managing policy documents.
 
-## Prerequisites
+## Tech Stack
 
-- Node.js (v18 or higher)
-- npm
+### Client
+- **Framework**: React (Vite)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **State Management**: React Context (AuthContext)
+- **HTTP Client**: Axios
 
-## Getting Started
-
-### 1. Setup Server
-
-The server uses SQLite by default.
-
-```bash
-cd server
-npm install
-npx prisma migrate dev --name init
-npm run build
-npm start
-```
-
-The API will be available at `http://localhost:3000`.
-
-### 2. Setup Client
-
-```bash
-cd client
-npm install
-npm run dev
-```
-
-The application will be available at `http://localhost:5173` (or similar, check console output).
-
-## Features Implemented
-
-- **Dashboard:** Overview of active policies, expiring items, and monthly costs.
-- **Asset Management:** List view with "Card Rows", search, and status indicators.
-- **Asset Details:** Slide-over panel with details, file upload placeholder, and history.
-- **Authentication (Backend):** Login endpoint and JWT middleware (Frontend integration pending).
+### Server
+- **Runtime**: Node.js
+- **Framework**: Express.js
+- **Database**: SQLite (via Prisma ORM)
+- **Authentication**: JWT (JSON Web Tokens)
+- **Validation**: Zod
 
 ## Project Structure
 
-- `/client`: React + Vite + Tailwind CSS application.
-- `/server`: Node.js + Express + Prisma API.
+- `/client` - React frontend application.
+- `/server` - Express backend API.
+
+## Setup & Installation
+
+### Prerequisites
+- Node.js (v16+)
+- npm
+
+### Installation
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/Bartes74/insurak.git
+    cd insurak
+    ```
+
+2.  **Install Client Dependencies:**
+    ```bash
+    cd client
+    npm install
+    ```
+
+3.  **Install Server Dependencies:**
+    ```bash
+    cd ../server
+    npm install
+    ```
+
+4.  **Database Setup:**
+    Initialize the SQLite database using Prisma.
+    ```bash
+    # Inside /server directory
+    npx prisma migrate dev --name init
+    ```
+
+### Configuration (.env)
+
+**Server (`server/.env`):**
+Create a `.env` file in the server directory with:
+```env
+PORT=5001
+# Use a strong secret in production
+JWT_SECRET="dev-secret-change-me-in-prod"
+DATABASE_URL="file:./dev.db"
+# Rate Limiting (Requests per 15 min)
+AUTH_RATE_MAX=100
+UPLOAD_RATE_MAX=50
+```
+
+**Client (`client/.env`):**
+Typically handled by Vite, defaults to localhost:3000 proxying to 5001.
+
+## Running the Application
+
+1.  **Start the Server:**
+    ```bash
+    cd server
+    npm run dev
+    ```
+    The server runs on `http://localhost:5001`.
+
+2.  **Start the Client:**
+    ```bash
+    cd client
+    npm run dev
+    ```
+    The client runs on `http://localhost:3000`.
+
+## Features
+- **Authentication**: Email/Password login with JWT.
+- **Asset Management**: Create, edit, and delete assets.
+- **Policy Tracking**: Monitor policy expiration, calculate progress bars.
+- **File Upload**: Attach PDF/Images to policies.
+- **Role-based Access**: Admin vs User roles (Admins can manage users).
+- **Zod Validation**: Strict input validation on the server.
+
+## Security Features (Phase 1 Implemented)
+- **Centralized Config**: No hardcoded secrets.
+- **Type Safety**: Full TypeScript support including `req.user`.
+- **Input Validation**: All endpoints validated with Zod.
+- **Rate Limiting**: Protection against brute-force attacks.
