@@ -1,5 +1,7 @@
 import nodemailer from 'nodemailer';
 
+import { config } from '../config';
+
 interface ResetEmailInput {
   to: string;
   token: string;
@@ -20,21 +22,22 @@ interface WelcomeEmailInput {
 }
 
 const {
-  SMTP_HOST,
-  SMTP_PORT,
-  SMTP_USER,
-  SMTP_PASS,
-  APP_URL = 'http://localhost:5173',
-} = process.env;
+  smtpHost,
+  smtpPort,
+  smtpUser,
+  smtpPass,
+  appUrl,
+} = config;
 
-const smtpConfigured = SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASS;
+
+const smtpConfigured = smtpHost && smtpPort && smtpUser && smtpPass;
 
 const transporter = smtpConfigured
   ? nodemailer.createTransport({
-    host: SMTP_HOST,
-    port: Number(SMTP_PORT),
-    secure: Number(SMTP_PORT) === 465,
-    auth: { user: SMTP_USER, pass: SMTP_PASS },
+    host: smtpHost,
+    port: Number(smtpPort),
+    secure: Number(smtpPort) === 465,
+    auth: { user: smtpUser, pass: smtpPass },
   })
   : null;
 
@@ -88,7 +91,7 @@ function getHtmlTemplate(title: string, bodyContent: string, ctaLink?: string, c
 }
 
 export async function sendResetEmail({ to, token, expiresAt }: ResetEmailInput) {
-  const resetLink = `${APP_URL}/reset-password?token=${token}`;
+  const resetLink = `${appUrl}/reset-password?token=${token}`;
 
   if (!transporter) {
     console.warn('[mailer] SMTP not configured; printing reset link instead:', resetLink);
@@ -107,7 +110,7 @@ export async function sendResetEmail({ to, token, expiresAt }: ResetEmailInput) 
   );
 
   await transporter.sendMail({
-    from: `"Insurak" <${SMTP_USER}>`,
+    from: `"Insurak" <${smtpUser}>`,
     to,
     subject: 'Reset hasła - Insurak',
     html,
@@ -115,7 +118,7 @@ export async function sendResetEmail({ to, token, expiresAt }: ResetEmailInput) 
 }
 
 export async function sendNotificationEmail({ to, assetId, assetName, endDate, stage }: NotificationEmailInput) {
-  const link = `${APP_URL}/assets/${assetId}`;
+  const link = `${appUrl}/assets/${assetId}`;
   const stageLabel = stage === 'first' ? 'Przypomnienie o polisie' : stage === 'followup' ? 'Wymagane działanie' : 'Polisa wygasa!';
   const isUrgent = stage === 'deadline';
 
@@ -142,7 +145,7 @@ export async function sendNotificationEmail({ to, assetId, assetName, endDate, s
   );
 
   await transporter.sendMail({
-    from: `"Insurak" <${SMTP_USER}>`,
+    from: `"Insurak" <${smtpUser}>`,
     to,
     subject: `[Insurak] ${stageLabel} - ${assetName}`,
     html,
@@ -150,7 +153,7 @@ export async function sendNotificationEmail({ to, assetId, assetName, endDate, s
 }
 
 export async function sendWelcomeEmail({ to, password }: WelcomeEmailInput) {
-  const loginLink = `${APP_URL}/login`;
+  const loginLink = `${appUrl}/login`;
 
   if (!transporter) {
     console.warn('[mailer] SMTP not configured; welcome email log:', { to, password });
@@ -173,7 +176,8 @@ export async function sendWelcomeEmail({ to, password }: WelcomeEmailInput) {
   );
 
   await transporter.sendMail({
-    from: `"Insurak" <${SMTP_USER}>`,
+    from: `"Insurak" <${smtpUser}>`,
+
     to,
     subject: 'Witaj w Insurak - Twoje konto zostało utworzone',
     html,

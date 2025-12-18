@@ -65,9 +65,18 @@ PORT=5001
 # Use a strong secret in production
 JWT_SECRET="dev-secret-change-me-in-prod"
 DATABASE_URL="file:./dev.db"
+
 # Rate Limiting (Requests per 15 min)
 AUTH_RATE_MAX=100
 UPLOAD_RATE_MAX=50
+
+# Email Configuration (Required for notifications & invites)
+# If missing, emails will be logged to the server console instead.
+SMTP_HOST="smtp.example.com"
+SMTP_PORT=587
+SMTP_USER="user@example.com"
+SMTP_PASS="password"
+APP_URL="http://localhost:3000" # URL of the Client App (for links in emails)
 ```
 
 **Client (`client/.env`):**
