@@ -50,7 +50,7 @@ export default function Dashboard() {
         });
         setActions(data.actionItems || []);
 
-        const cf = data.cashflow || [];
+        const cf: CashflowPoint[] = data.cashflow || [];
         setCashflow(cf);
 
         // Find index of current month (YYYY-MM)
@@ -326,4 +326,3 @@ function KpiCard({ label, value, icon, gradient, to }: { label: string; value: s
 
   return CardContent;
 }
-
